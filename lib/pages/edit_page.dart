@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:listview_app/list_provider.dart';
+import 'package:listview_app/providers/list_provider.dart';
 import 'package:provider/provider.dart';
 
 class EditPage extends StatefulWidget {
@@ -16,8 +16,7 @@ class _EditPageState extends State<EditPage> {
   void initState() {
     super.initState();
     final listProvider = Provider.of<ListProvider>(context, listen: false);
-    _textController.text =
-        listProvider.getNote(listProvider.selectedIndex).text;
+    _textController.text = listProvider.notes[listProvider.selectedIndex].text;
   }
 
   @override

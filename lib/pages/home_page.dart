@@ -1,8 +1,9 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:listview_app/constants.dart';
-import 'package:listview_app/hive/boxes.dart';
+import 'package:listview_app/utils/constants.dart';
 import 'package:listview_app/hive/notes.dart';
-import 'package:listview_app/list_provider.dart';
+import 'package:listview_app/providers/list_provider.dart';
 import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
@@ -17,22 +18,35 @@ class _MyHomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        appBar: AppBar(
+          actions: [
+            Builder(
+                builder: (context) => IconButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, fourthPage);
+                    },
+                    icon: const Icon(Icons.settings)))
+          ],
+        ),
         body: Consumer<ListProvider>(builder: (context, listProvider, child) {
           return ReorderableListView.builder(
-            itemCount: notesBox.length,
+            itemCount: listProvider.notes.length,
             onReorder: ((oldIndex, newIndex) {
               final index = newIndex > oldIndex ? newIndex - 1 : newIndex;
-              final note = listProvider.list.removeAt(oldIndex);
+              final note = listProvider.notes.removeAt(oldIndex);
               listProvider.insertNote(index, note);
             }),
             padding: const EdgeInsets.all(8.0),
             itemBuilder: (BuildContext context, int index) {
-              final Note note = listProvider.getNote(index);
+              final Note note = listProvider.notes[index];
               return ListTile(
                 key: ValueKey(index),
                 contentPadding:
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 title: Text(note.text),
+                leading: note.photoPath != null
+                    ? Image.file(File(note.photoPath!))
+                    : null,
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -51,7 +65,7 @@ class _MyHomePageState extends State<HomePage> {
                                 builder: (context) {
                                   return AlertDialog(
                                     title: Text(
-                                      'Delete user $index?',
+                                      'Delete note $index?',
                                       textAlign: TextAlign.end,
                                     ),
                                     actions: [
